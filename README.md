@@ -1,0 +1,1 @@
+ELK to CentOS7 with ansible You need to have anislbe installed "yum install ansible" And then you can use the playbook with "ansible-playbook elkstack.yml" Or you can play each tag with "anisble-playbook elkstack.yml --tags kibana" or logstash or elasticsearch instead of kibana.
