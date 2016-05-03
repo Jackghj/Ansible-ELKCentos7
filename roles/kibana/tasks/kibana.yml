@@ -1,0 +1,45 @@
+- name: Create Kibana dir
+  file: 
+   path="{{ kibana_dir }}"
+   state=directory
+
+- name: Create Kibana log dir
+  file: 
+    path="{{ kibana_dir }}logs"
+    state=directory
+
+- name: Get Kibana
+  get_url: 
+    url={{ kibana_url }} 
+    dest=/tmp/kibana.tar.gz
+
+- name: Unarchive kibana
+  unarchive:
+    src: /tmp/kibana.tar.gz
+    dest: "{{ kibana_dir }}"
+    copy: no
+
+- name: Kibana Permissions
+  command: /bin/chown -R root.root {{ kibana_dir }}
+
+- name: Create kibana init-script
+  template:
+    src=kibana.j2
+    dest=/etc/init.d/kibana
+    owner=root
+    group=root
+    mode=0755
+
+- name: Create htpasswd file for Kibana
+  template:
+    src=htpasswd.j2
+    dest={{ kibana_dir }}htpasswd
+    owner=nginx
+    group=nginx
+    mode=0600
+
+- name: Enable kibana service
+  service: 
+    name=kibana
+    enabled=yes
+    state=started

@@ -1,0 +1,13 @@
+- name: Elasticsearch configuration
+  template: 
+    src=elasticsearch.yml.j2
+    dest=/etc/elasticsearch/elasticsearch.yml
+    owner=root
+    group=elasticsearch
+    mode=0644
+
+- name: Enable elasticsearch service
+  service:
+    name=elasticsearch
+    enabled=yes
+    state=started

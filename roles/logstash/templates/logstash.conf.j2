@@ -1,0 +1,46 @@
+input {
+  tcp {
+    port => {{ logstash_syslog_port_tcp }}
+    type => syslog
+  }
+  udp {
+    port =>  {{ logstash_syslog_port_udp }}
+    type => syslog
+  }
+}
+
+filter {
+  if [type] == "syslog" {
+    grok {
+      patterns_dir => "{{ logstash_patterns_dir }}"
+      match => { "message" => "<%{NONNEGINT:facility}>%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} \[%{DATA:syslog_program}\:%{POSINT:syslog_pid}\] %{TIMESTAMP_ISO8601_TZ:time_stamp}\|%{DATA:bindingIn}\|%{DATA:messageIdIn}\|%{URI:serviceProvider}\|%{DATA:profileId}\|%{URI:identityProvider}\|%{DATA:statusMessage}\|%{DATA:bindingOut}\|%{DATA:messageIdOut}\|%{DATA:userId}\|%{DATA:authnContext}\|%{DATA:attributes}\|%{DATA:nameId}\|%{DATA:assertionId}\|%{GREEDYDATA:jsessionId}" }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    grok {
+      match => { "message" => "<%{POSINT:facility}>%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:hostname} \[%{PROG:syslog_prog}:%{POSINT:pid}\] Profile Action %{DATA:profileAction}: Login by '%{USERNAME:username}' %{DATA:status}\|%{DATA:jsessionId}$" }
+     }
+if [status] == "succeeded" {
+      mutate {
+        add_tag => [ "login_success"]
+      }
+    }
+if [status] == "failed" {
+      mutate {
+        add_tag => [ "login_failed"]
+      }
+    }
+    date {
+      locale => "en"
+      match => ["time_stamp", "YYYYMMdd'T'HHmmss'Z'"]
+      target => "@timestamp"
+    }
+  }
+}
+
+output {
+  elasticsearch {
+    document_type => "idp-audit"
+    hosts => "{{ elasticsearch_network_host }}"
+  }
+}

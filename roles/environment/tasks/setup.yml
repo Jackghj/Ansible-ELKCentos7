@@ -1,0 +1,5 @@
+- name: Set SELinux to permissive
+  selinux:
+    policy=targeted
+    state=permissive
+  when: disable_selinux == "True"

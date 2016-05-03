@@ -1,0 +1,46 @@
+- name: Create patterns dir
+  file:
+    path={{ logstash_patterns_dir }}
+    owner=root
+    group=root
+    mode=0755
+    state=directory
+
+- name: Create patterns config
+  template:
+    src=grok-pattern.j2
+    dest="{{ logstash_patterns_dir }}grok-pattern"
+    owner=root
+    group=root
+    mode=0644
+
+- name: Create logstash config
+  template:
+    src=logstash.conf.j2
+    dest="/etc/logstash/conf.d/logstash.conf"
+    owner=root
+    group=root
+    mode=0644
+
+- name: Set user for logstash init-script
+  lineinfile:
+    dest=/etc/init.d/logstash
+    regexp="^LS_USER="
+    line="LS_USER=root"
+    state=present
+
+- name: Set group for logstash init-script
+  lineinfile:
+    dest=/etc/init.d/logstash
+    regexp="^LS_GROUP="
+    line="LS_GROUP=root"
+    state=present
+
+- name: Install Logstash translate plugin
+  shell: /opt/logstash/bin/plugin install logstash-filter-translate
+
+- name: Enable Logstash service
+  service:
+    name=logstash
+    enabled=yes
+    state=started

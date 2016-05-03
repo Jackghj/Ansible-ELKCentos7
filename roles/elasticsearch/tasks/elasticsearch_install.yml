@@ -1,0 +1,10 @@
+- name: Add Logstash repo key
+  rpm_key: key="http://packages.elasticsearch.org/GPG-KEY-elasticsearch" state=present
+
+- name: Enable Elasticsearch repository
+  template: src=elasticsearch_repo.j2 dest=/etc/yum.repos.d/elasticsearch.repo
+
+- name: Install Elasticsearch 
+  yum: name=elasticsearch state=latest
+  notify:
+   - restart elasticsearch

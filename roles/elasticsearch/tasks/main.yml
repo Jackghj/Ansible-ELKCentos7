@@ -1,0 +1,3 @@
+- include: openjdk.yml
+- include: elasticsearch_install.yml
+- include: elasticsearch_config.yml

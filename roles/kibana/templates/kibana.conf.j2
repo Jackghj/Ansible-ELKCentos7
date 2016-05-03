@@ -1,0 +1,84 @@
+server {
+	listen 80;
+
+	server_name elkstack;
+	access_log {{ kibana_dir }}logs/access.log;
+        error_log {{ kibana_dir }}logs/error.log warn;
+
+    location /kibana {
+        proxy_pass http://127.0.0.1:5601/app/kibana;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        auth_basic "Restricted";
+        auth_basic_user_file /opt/kibana/htpasswd;
+    }
+    location /marvel {
+        proxy_pass http://127.0.0.1:5601/marvel;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+    location /bundles {
+        proxy_pass http://127.0.0.1:5601/bundles;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+    location /elasticsearch {
+        proxy_pass http://127.0.0.1:5601/elasticsearch;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+    location /plugins {
+        proxy_pass http://127.0.0.1:5601/plugins;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+    location /app/ {
+        proxy_pass http://127.0.0.1:5601/app/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+    location /status/ {
+        proxy_pass http://127.0.0.1:5601/status;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+    location /api/status/ {
+        proxy_pass http://127.0.0.1:5601/api/status;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+    location /#/ {
+        proxy_pass http://127.0.0.1:5601/app/kibana#/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+    location / {
+        proxy_pass http://127.0.0.1:5601/app/kibana;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        auth_basic "Restricted";
+        auth_basic_user_file /opt/kibana/htpasswd;
+    }
+
+}
+
